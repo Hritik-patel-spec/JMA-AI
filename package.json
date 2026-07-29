@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "livekit-client": "^2.21.0"
+  },
+  "devDependencies": {
+    "ts-unused-exports": "^11.0.1"
+  }
+}
