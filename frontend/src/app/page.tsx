@@ -98,25 +98,42 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("jma_user");
+    let parsedUser: UserProfile;
+
     if (!storedUser) {
-      router.push("/login");
-      return;
+      // Default dummy profile to bypass login completely
+      parsedUser = {
+        name: "Ritik Patel",
+        class: "IT Head",
+        rollNo: "01",
+        phone: "9999999999",
+        email: "ritik@jma.edu"
+      };
+      localStorage.setItem("jma_user", JSON.stringify(parsedUser));
+    } else {
+      try {
+        parsedUser = JSON.parse(storedUser);
+      } catch (e) {
+        parsedUser = {
+          name: "Ritik Patel",
+          class: "IT Head",
+          rollNo: "01",
+          phone: "9999999999",
+          email: "ritik@jma.edu"
+        };
+        localStorage.setItem("jma_user", JSON.stringify(parsedUser));
+      }
     }
 
-    try {
-      const parsedUser: UserProfile = JSON.parse(storedUser);
-      setUser(parsedUser);
-      const userKey = parsedUser.phone || parsedUser.email;
-      
-      const newChatId = "chat_" + Date.now();
-      const newVoiceId = "voice_" + Date.now();
-      setCurrentSessionId(newChatId);
-      setCurrentVoiceSessionId(newVoiceId);
+    setUser(parsedUser);
+    const userKey = parsedUser.phone || parsedUser.email;
+    
+    const newChatId = "chat_" + Date.now();
+    const newVoiceId = "voice_" + Date.now();
+    setCurrentSessionId(newChatId);
+    setCurrentVoiceSessionId(newVoiceId);
 
-      fetchUserHistory(userKey);
-    } catch (e) {
-      router.push("/login");
-    }
+    fetchUserHistory(userKey);
 
     const savedTheme = localStorage.getItem("jma_theme") as "dark" | "light";
     if (savedTheme) setTheme(savedTheme);
@@ -159,7 +176,6 @@ export default function DashboardPage() {
 
     const voices = window.speechSynthesis.getVoices();
     
-    // Strict Indian Female Voice Filtering (hi-IN / en-IN)
     const targetVoice = voices.find((voice) => {
       const name = voice.name.toLowerCase();
       const lang = voice.lang.toLowerCase();
@@ -329,7 +345,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     localStorage.removeItem("jma_user");
-    router.push("/login");
+    // Redirection removed as per your choice, keeping profile reset or home stay
   };
 
   const copyToClipboard = (text: string, index: number) => {
@@ -408,10 +424,10 @@ export default function DashboardPage() {
             </div>
             <div className="overflow-hidden">
               <h4 className="text-xs font-semibold truncate">{user.name}</h4>
-              <p className="text-[10px] text-gray-400 truncate">Class {user.class}</p>
+              <p className="text-[10px] text-gray-400 truncate">{user.class}</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 p-1.5 transition cursor-pointer"><LogOut size={16} /></button>
+          <button onClick={handleLogout} className="text-gray-400 hover:text-red-400 p-1.5 transition cursor-pointer" title="Reset Session"><LogOut size={16} /></button>
         </div>
       </aside>
 
